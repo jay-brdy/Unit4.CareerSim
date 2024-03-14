@@ -3,11 +3,11 @@ const {
     createTables,
     createUser,
     createProduct,
-    createFavorite,
+    createCartProduct,
     fetchUsers,
     fetchProducts,
-    fetchFavorites,
-    destroyFavorite,
+    fetchCartProducts,
+    destroyCartProduct,
     authenticate,
     findUserWithToken
   } = require('./db');
@@ -62,45 +62,45 @@ const {
     }
   });
   
-  // retrieves favorites for a specifc user
-  app.get('/api/users/:id/favorites', isLoggedIn, async(req, res, next)=> {
+  // retrieves entire cart with products for a specifc user
+  app.get('/api/users/:id/cart_products', isLoggedIn, async(req, res, next)=> {
     try {
       if(req.params.id !== req.user.id){
         const error = Error('not authorized');
         error.status = 401;
         throw error;
       }
-      res.send(await fetchFavorites(req.params.id));
+      res.send(await fetchCartProducts(req.params.id));
     }
     catch(ex){
       next(ex);
     }
   });
   
-  // creates a favorite for a user
-  app.post('/api/users/:id/favorites', isLoggedIn, async(req, res, next)=> {
+  // creates a product inside cart for a user
+  app.post('/api/users/:id/cart_products', isLoggedIn, async(req, res, next)=> {
     try {
       if(req.params.id !== req.user.id){
         const error = Error('not authorized');
         error.status = 401;
         throw error;
       }
-      res.status(201).send(await createFavorite({ user_id: req.params.id, product_id: req.body.product_id}));
+      res.status(201).send(await createCartProduct({ user_id: req.params.id, product_id: req.body.product_id}));
     }
     catch(ex){
       next(ex);
     }
   });
   
-  // deletes a favorite of a user
-  app.delete('/api/users/:user_id/favorites/:id', isLoggedIn, async(req, res, next)=> {
+  // deletes a product from a cart of a user
+  app.delete('/api/users/:user_id/cart_products/:id', isLoggedIn, async(req, res, next)=> {
     try {
       if(req.params.userId !== req.user.id){
         const error = Error('not authorized');
         error.status = 401;
         throw error;
       }
-      await destroyFavorite({user_id: req.params.user_id, id: req.params.id });
+      await destroyCartProduct({user_id: req.params.user_id, id: req.params.id });
       res.sendStatus(204);
     }
     catch(ex){
@@ -147,8 +147,8 @@ const {
     console.log(await fetchUsers());
     console.log(await fetchProducts());
   
-    console.log(await fetchFavorites(moe.id));
-    const favorite = await createFavorite({ user_id: moe.id, product_id: foo.id });
+    console.log(await fetchCartProducts(moe.id));
+    const cart_product = await createCartProduct({ user_id: moe.id, product_id: foo.id });
     app.listen(port, ()=> console.log(`listening on port ${port}`));
   };
   

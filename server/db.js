@@ -52,17 +52,17 @@ const createProduct = async ({ name }) => {
     return response.rows[0];
 };
 
-const createFavorite = async ({ user_id, product_id }) => {
+const createCartProduct = async ({ user_id, product_id }) => {
     const SQL = `
-    INSERT INTO favorites(id, user_id, product_id) VALUES($1, $2, $3) RETURNING *
+    INSERT INTO cart_products(id, user_id, product_id) VALUES($1, $2, $3) RETURNING *
   `;
     const response = await client.query(SQL, [uuid.v4(), user_id, product_id]);
     return response.rows[0];
 };
 
-const destroyFavorite = async ({ user_id, id }) => {
+const destroyCartProduct = async ({ user_id, id }) => {
     const SQL = `
-    DELETE FROM favorites WHERE user_id=$1 AND id=$2
+    DELETE FROM cart_products WHERE user_id=$1 AND id=$2
   `;
     await client.query(SQL, [user_id, id]);
 };
@@ -124,9 +124,9 @@ const fetchProducts = async () => {
     return response.rows;
 };
 
-const fetchFavorites = async (user_id) => {
+const fetchCartProducts = async (user_id) => {
     const SQL = `
-    SELECT * FROM favorites where user_id = $1
+    SELECT * FROM cart_products where user_id = $1
   `;
     const response = await client.query(SQL, [user_id]);
     return response.rows;
@@ -137,11 +137,11 @@ module.exports = {
     createTables,
     createUser,
     createProduct,
+    createCartProduct,
     fetchUsers,
     fetchProducts,
-    fetchFavorites,
-    createFavorite,
-    destroyFavorite,
+    fetchCartProducts,
+    destroyCartProduct,
     authenticate,
     findUserWithToken
 };
