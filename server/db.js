@@ -28,7 +28,7 @@ const createTables = async () => {
         );
         CREATE TABLE cart_products(
             id UUID PRIMARY KEY,
-            cart_id UUID REFERENCES cartss(id) NOT NULL,
+            cart_id UUID REFERENCES carts(id) NOT NULL,
             product_id UUID REFERENCES products(id) NOT NULL,
             CONSTRAINT unique_cart_id_and_product_id UNIQUE (cart_id, product_id)
         );
@@ -52,19 +52,26 @@ const createProduct = async ({ name }) => {
     return response.rows[0];
 };
 
-const createCartProduct = async ({ user_id, product_id }) => {
+const createCartProduct = async ({ cart_id, product_id }) => {
+    const cartExistsQuery = 'SELECT id FROM carts WHERE id = $1';
+    const cartExistsResult = await client.query(cartExistsQuery, [cart_id]);
+
+    if (cartExistsResult.rows.length === 0) {
+        throw new Error('Cart does not exist');
+    }
+
     const SQL = `
-    INSERT INTO cart_products(id, user_id, product_id) VALUES($1, $2, $3) RETURNING *
+    INSERT INTO cart_products(id, cart_id, product_id) VALUES($1, $2, $3) RETURNING *
   `;
-    const response = await client.query(SQL, [uuid.v4(), user_id, product_id]);
+    const response = await client.query(SQL, [uuid.v4(), cart_id, product_id]);
     return response.rows[0];
 };
 
-const destroyCartProduct = async ({ user_id, id }) => {
+const destroyCartProduct = async ({ cart_id, id }) => {
     const SQL = `
-    DELETE FROM cart_products WHERE user_id=$1 AND id=$2
+    DELETE FROM cart_products WHERE cart_id=$1 AND id=$2
   `;
-    await client.query(SQL, [user_id, id]);
+    await client.query(SQL, [cart_id, id]);
 };
 
 const authenticate = async ({ username, password }) => {
@@ -124,11 +131,11 @@ const fetchProducts = async () => {
     return response.rows;
 };
 
-const fetchCartProducts = async (user_id) => {
+const fetchCartProducts = async (cart_id) => {
     const SQL = `
-    SELECT * FROM cart_products where user_id = $1
+    SELECT * FROM cart_products where cart_id = $1
   `;
-    const response = await client.query(SQL, [user_id]);
+    const response = await client.query(SQL, [cart_id]);
     return response.rows;
 };
 

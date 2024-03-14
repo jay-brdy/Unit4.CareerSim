@@ -63,7 +63,7 @@ const {
   });
   
   // retrieves entire cart with products for a specifc user
-  app.get('/api/users/:id/cart_products', isLoggedIn, async(req, res, next)=> {
+  app.get('/api/carts/:id/cart_products', isLoggedIn, async(req, res, next)=> {
     try {
       if(req.params.id !== req.user.id){
         const error = Error('not authorized');
@@ -78,14 +78,14 @@ const {
   });
   
   // creates a product inside cart for a user
-  app.post('/api/users/:id/cart_products', isLoggedIn, async(req, res, next)=> {
+  app.post('/api/carts/:id/cart_products', isLoggedIn, async(req, res, next)=> {
     try {
       if(req.params.id !== req.user.id){
         const error = Error('not authorized');
         error.status = 401;
         throw error;
       }
-      res.status(201).send(await createCartProduct({ user_id: req.params.id, product_id: req.body.product_id}));
+      res.status(201).send(await createCartProduct({ cart_id: req.params.id, product_id: req.body.product_id}));
     }
     catch(ex){
       next(ex);
@@ -93,14 +93,14 @@ const {
   });
   
   // deletes a product from a cart of a user
-  app.delete('/api/users/:user_id/cart_products/:id', isLoggedIn, async(req, res, next)=> {
+  app.delete('/api/carts/:cart_id/cart_products/:id', isLoggedIn, async(req, res, next)=> {
     try {
-      if(req.params.userId !== req.user.id){
+      if(req.params.cart_id !== req.user.id){
         const error = Error('not authorized');
         error.status = 401;
         throw error;
       }
-      await destroyCartProduct({user_id: req.params.user_id, id: req.params.id });
+      await destroyCartProduct({cart_id: req.params.cart_id, id: req.params.id });
       res.sendStatus(204);
     }
     catch(ex){
@@ -148,7 +148,7 @@ const {
     console.log(await fetchProducts());
   
     console.log(await fetchCartProducts(moe.id));
-    const cart_product = await createCartProduct({ user_id: moe.id, product_id: foo.id });
+    const cart_product = await createCartProduct({ cart_id: moe.id, product_id: foo.id });
     app.listen(port, ()=> console.log(`listening on port ${port}`));
   };
   
