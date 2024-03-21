@@ -33,6 +33,7 @@ const createTables = async () => {
         );
         CREATE TABLE cart_products(
             id UUID PRIMARY KEY,
+            user_id UUID REFERENCES users(id) ON DELETE CASCADE NOT NULL,
             cart_id UUID REFERENCES carts(id) NOT NULL,
             product_id UUID REFERENCES products(id) NOT NULL,
             CONSTRAINT unique_cart_id_and_product_id UNIQUE (cart_id, product_id),
@@ -162,6 +163,26 @@ const fetchCartProducts = async (cart_id) => {
     return response.rows;
 };
 
+const checkoutCart = async (cart_id) => {
+    const SQL = `
+        DELETE FROM cart_products
+        WHERE cart_id = $1
+    `;
+    await client.query(SQL, [cart_id]);
+};
+
+const updateCartProductQuantity = async ({ cart_id, product_id, quantity }) => {
+    const SQL = `
+        UPDATE cart_products 
+        SET quantity = $1 
+        WHERE cart_id = $2 AND product_id = $3
+        RETURNING *;
+    `;
+    const response = await client.query(SQL, [quantity, cart_id, product_id]);
+    return response.rows[0];
+};
+
+
 module.exports = {
     client,
     createTables,
@@ -175,5 +196,7 @@ module.exports = {
     fetchCartProducts,
     destroyCartProduct,
     authenticate,
-    findUserWithToken
+    findUserWithToken,
+    updateCartProductQuantity,
+    checkoutCart
 };

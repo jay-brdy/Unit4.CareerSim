@@ -11,7 +11,9 @@ const {
     fetchCartProducts,
     destroyCartProduct,
     authenticate,
-    findUserWithToken
+    findUserWithToken,
+    updateCartProductQuantity,
+    checkoutCart
   } = require('./db');
   const express = require('express');
   const app = express();
@@ -37,6 +39,9 @@ const {
   app.post('/api/auth/login', async(req, res, next)=> {
     try {
       res.send(await authenticate(req.body));
+      const user = await findUserWithToken(token);
+      const cart = await fetchCart(user.id);
+      res.send({ token, user, cart });
     }
     catch(ex){
       next(ex);
@@ -78,6 +83,16 @@ const {
       next(ex);
     }
   });
+
+   // retrieves all products
+   app.get('/api/products', async(req, res, next)=> {
+    try {
+      res.send(await fetchProducts());
+    }
+    catch(ex){
+      next(ex);
+    }
+  });
   
   // creates a product inside cart for a user
   app.post('/api/carts/:id/cart_products', isLoggedIn, async(req, res, next)=> {
@@ -93,6 +108,37 @@ const {
       next(ex);
     }
   });
+
+  // edit cart - change quantity or remove product 0
+  app.put('api/carts/:cart_id/cart_products/:id', isLoggedIn, async(req, res, next)=> {
+    try {
+      if(req.params.cart_id !== req.user.id){
+        const error = Error('not authorized');
+        error.status = 401;
+        throw error;
+      }
+      const { quantity } = req.body;
+      await updateCartProductQuantity({ cart_id: req.params.cart_id, product_id: req.params.id, quantity });
+      res.sendStatus(204);
+    } catch (ex) {
+      next(ex);
+    }
+  });
+
+  // proceeds to checkout
+  app.post('/api/carts/:cart_id/checkout', isLoggedIn, async(req, res, next)=> {
+    try {
+        if (req.params.cart_id !== req.user.id) {
+            const error = Error('not authorized');
+            error.status = 401;
+            throw error;
+        }
+        await checkoutCart(req.params.cart_id);
+        res.send({ message: 'Checkout successful!' });
+    } catch(ex) {
+        next(ex);
+    }
+});
   
   // deletes a product from a cart of a user
   app.delete('/api/carts/:cart_id/cart_products/:id', isLoggedIn, async(req, res, next)=> {
@@ -110,15 +156,6 @@ const {
     }
   });
   
-  // retrieves all products
-  app.get('/api/products', async(req, res, next)=> {
-    try {
-      res.send(await fetchProducts());
-    }
-    catch(ex){
-      next(ex);
-    }
-  });
   
   app.use((err, req, res, next)=> {
     console.log(err);
