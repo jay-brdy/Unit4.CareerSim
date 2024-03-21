@@ -156,11 +156,22 @@ const {
     }
   });
   
-  
   app.use((err, req, res, next)=> {
     console.log(err);
     res.status(err.status || 500).send({ error: err.message ? err.message : err });
   });
+
+  // ADMIN abilities
+
+  // admin see all users
+
+  // admin add product
+
+  // admin update/edit product
+
+  // admin delete product from inventory
+
+
   
   // init function 
   const init = async()=> {
@@ -171,23 +182,48 @@ const {
     await createTables();
     console.log('tables created');
   
-    const [moe, lucy, ethyl, curly, foo, bar, bazz, quq, fip] = await Promise.all([
+    const [moe, lucy, ethyl, jay, tshirt, jacket, hat, socks, sticker] = await Promise.all([
       createUser({ username: 'moe', password: 'm_pw'}),
       createUser({ username: 'lucy', password: 'l_pw'}),
       createUser({ username: 'ethyl', password: 'e_pw'}),
-      createUser({ username: 'curly', password: 'c_pw'}),
-      createProduct({ name: 'foo' }),
-      createProduct({ name: 'bar' }),
-      createProduct({ name: 'bazz' }),
-      createProduct({ name: 'quq' }),
-      createProduct({ name: 'fip' })
+      createUser({ username: 'jay', password: 'j_pw', is_admin: true}),
+      createProduct({
+         name: 'tshirt',
+         description: 'a very cool tshirt',
+         price: 25.00,
+         inventory: 100
+      }),
+      createProduct({ 
+         name: 'jacket',
+         description: 'a very comfy jacket',
+         price: 50.00,
+         inventory: 100
+      }),
+      createProduct({ 
+         name: 'hat',
+         description: 'an accessory to block the sun',
+         price: 15.00,
+         inventory: 100
+      }),
+      createProduct({ 
+         name: 'socks',
+         description: 'a garment to keep your toes protected',
+         price: 10.00,
+         inventory: 100
+      }),
+      createProduct({
+         name: 'sticker',
+         description: 'show your support by representing us',
+         price: 3.00,
+         inventory: 100 
+      })
     ]);
   
     console.log(await fetchUsers());
     console.log(await fetchProducts());
   
     console.log(await fetchCartProducts(moe.id));
-    const cart_product = await createCartProduct({ cart_id: moe.id, product_id: foo.id });
+    const cart_product = await createCartProduct({ cart_id: moe.id, product_id: tshirt.id });
     app.listen(port, ()=> console.log(`listening on port ${port}`));
   };
   
