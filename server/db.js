@@ -19,7 +19,7 @@ const createTables = async () => {
             password VARCHAR(255) NOT NULL
             address VARCHAR(255),
             payment_info VARCHAR(16),
-            is_admin BOOLEAN
+            is_admin BOOLEAN DEFAULT FALSE
         );
         CREATE TABLE carts(
             id UUID PRIMARY KEY,
@@ -28,8 +28,9 @@ const createTables = async () => {
         CREATE TABLE products(
             id UUID PRIMARY KEY,
             name VARCHAR(50)
-            price NUMERIC(7,5)
-            inventory NUMERIC
+            description VARCHAR(255),
+            price NUMERIC(7,2)
+            inventory INTEGER
         );
         CREATE TABLE cart_products(
             id UUID PRIMARY KEY,
@@ -37,7 +38,7 @@ const createTables = async () => {
             cart_id UUID REFERENCES carts(id) NOT NULL,
             product_id UUID REFERENCES products(id) NOT NULL,
             CONSTRAINT unique_cart_id_and_product_id UNIQUE (cart_id, product_id),
-            inventory NUMERIC
+            inventory INTEGER
         );
     `;
     await client.query(SQL);
