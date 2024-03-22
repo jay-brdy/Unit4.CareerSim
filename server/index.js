@@ -175,7 +175,6 @@ const {
   
   // init function 
   const init = async()=> {
-    const port = process.env.PORT || 3000;
     await client.connect();
     console.log('connected to database');
   
@@ -224,6 +223,8 @@ const {
   
     console.log(await fetchCartProducts(moe.id));
     const cart_product = await createCartProduct({ cart_id: moe.id, product_id: tshirt.id });
+    
+    const port = process.env.PORT || 3000;
     app.listen(port, ()=> console.log(`listening on port ${port}`));
   };
   
