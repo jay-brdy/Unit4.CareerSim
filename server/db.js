@@ -16,7 +16,7 @@ const createTables = async () => {
         CREATE TABLE users(
             id UUID PRIMARY KEY,
             username VARCHAR(20) UNIQUE NOT NULL,
-            password VARCHAR(255) NOT NULL
+            password VARCHAR(255) NOT NULL,
             address VARCHAR(255),
             payment_info VARCHAR(16),
             is_admin BOOLEAN DEFAULT FALSE
@@ -27,9 +27,9 @@ const createTables = async () => {
         );
         CREATE TABLE products(
             id UUID PRIMARY KEY,
-            name VARCHAR(50)
+            name VARCHAR(50),
             description VARCHAR(255),
-            price NUMERIC(7,2)
+            price NUMERIC(7,2),
             inventory INTEGER
         );
         CREATE TABLE cart_products(
