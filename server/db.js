@@ -145,7 +145,7 @@ const fetchCart = async (cart_id) => {
         SELECT * FROM carts WHERE id = $1
     `;
     const response = await client.query(SQL, [cart_id]);
-    return response.rows;
+    return response.rows[0];
 }
 
 const fetchProducts = async () => {

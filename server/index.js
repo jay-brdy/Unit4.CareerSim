@@ -110,7 +110,7 @@ const {
   });
 
   // edit cart - change quantity or remove product 0
-  app.put('api/carts/:cart_id/cart_products/:id', isLoggedIn, async(req, res, next)=> {
+  app.put('/api/carts/:cart_id/cart_products/:id', isLoggedIn, async(req, res, next)=> {
     try {
       if(req.params.cart_id !== req.user.id){
         const error = Error('not authorized');
