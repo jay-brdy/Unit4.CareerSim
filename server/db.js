@@ -10,7 +10,7 @@ const createTables = async () => {
     const SQL = `
         DROP TABLE IF EXISTS cart_products;
         DROP TABLE IF EXISTS carts;
-        DROP TABLE IF EXISTS users;
+        DROP TABLE IF EXISTS users CASCADE;
         DROP TABLE IF EXISTS products;
 
         CREATE TABLE users(
@@ -34,7 +34,7 @@ const createTables = async () => {
         );
         CREATE TABLE cart_products(
             id UUID PRIMARY KEY,
-            user_id UUID REFERENCES users(id) ON DELETE CASCADE NOT NULL,
+            user_id UUID REFERENCES users(id) NOT NULL,
             cart_id UUID REFERENCES carts(id) NOT NULL,
             product_id UUID REFERENCES products(id) NOT NULL,
             CONSTRAINT unique_cart_id_and_product_id UNIQUE (cart_id, product_id),
