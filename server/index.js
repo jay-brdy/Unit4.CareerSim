@@ -38,7 +38,7 @@ const {
   // user auth
   app.post('/api/auth/login', async(req, res, next)=> {
     try {
-      res.send(await authenticate(req.body));
+      const { token } = await authenticate(req.body);
       const user = await findUserWithToken(token);
       const cart = await fetchCart(user.id);
       res.send({ token, user, cart });
