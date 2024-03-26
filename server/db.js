@@ -37,7 +37,7 @@ const createTables = async () => {
             cart_id UUID REFERENCES carts(id) NOT NULL,
             product_id UUID REFERENCES products(id) NOT NULL,
             CONSTRAINT unique_cart_id_and_product_id UNIQUE (cart_id, product_id),
-            inventory INTEGER
+            quantity INTEGER
         );
     `;
     await client.query(SQL);
@@ -60,15 +60,15 @@ const createCart = async ({ user_id }) => {
 
 }
 
-const createProduct = async ({ name }) => {
+const createProduct = async ({ name, description, price, inventory }) => {
     const SQL = `
-        INSERT INTO products(id, name) VALUES($1, $2) RETURNING *
+        INSERT INTO products(id, name, description, price, inventory) VALUES($1, $2, $3, $4, $5) RETURNING *
     `;
-    const response = await client.query(SQL, [uuid.v4(), name]);
+    const response = await client.query(SQL, [uuid.v4(), name, description, price, inventory]);
     return response.rows[0];
 };
 
-const createCartProduct = async ({ cart_id, product_id }) => {
+const createCartProduct = async ({ cart_id, product_id, quantity }) => {
     // check if a cart exists
     // const cartExistsQuery = 'SELECT id FROM carts WHERE id = $1 AND user_id = $2';
     // const cartExistsResult = await client.query(cartExistsQuery, [cart_id, user_id]);
@@ -78,9 +78,9 @@ const createCartProduct = async ({ cart_id, product_id }) => {
     // }
 
     const SQL = `
-        INSERT INTO cart_products(id, cart_id, product_id) VALUES($1, $2, $3) RETURNING *
+        INSERT INTO cart_products(id, cart_id, product_id, quantity) VALUES($1, $2, $3, $4) RETURNING *
     `;
-    const response = await client.query(SQL, [uuid.v4(), cart_id, product_id]);
+    const response = await client.query(SQL, [uuid.v4(), cart_id, product_id, quantity]);
     return response.rows[0];
 };
 
