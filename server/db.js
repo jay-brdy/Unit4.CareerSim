@@ -70,6 +70,7 @@ const createProduct = async ({ name }) => {
 };
 
 const createCartProduct = async ({ cart_id, product_id }) => {
+    // check if a cart exists
     const cartExistsQuery = 'SELECT id FROM carts WHERE id = $1';
     const cartExistsResult = await client.query(cartExistsQuery, [cart_id]);
 
