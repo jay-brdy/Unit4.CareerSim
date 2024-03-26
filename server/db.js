@@ -34,7 +34,6 @@ const createTables = async () => {
         );
         CREATE TABLE cart_products(
             id UUID PRIMARY KEY,
-            user_id UUID REFERENCES users(id) NOT NULL,
             cart_id UUID REFERENCES carts(id) NOT NULL,
             product_id UUID REFERENCES products(id) NOT NULL,
             CONSTRAINT unique_cart_id_and_product_id UNIQUE (cart_id, product_id),
@@ -71,12 +70,12 @@ const createProduct = async ({ name }) => {
 
 const createCartProduct = async ({ cart_id, product_id }) => {
     // check if a cart exists
-    const cartExistsQuery = 'SELECT id FROM carts WHERE id = $1';
-    const cartExistsResult = await client.query(cartExistsQuery, [cart_id]);
+    // const cartExistsQuery = 'SELECT id FROM carts WHERE id = $1 AND user_id = $2';
+    // const cartExistsResult = await client.query(cartExistsQuery, [cart_id, user_id]);
 
-    if (cartExistsResult.rows.length === 0) {
-        throw new Error('Cart does not exist');
-    }
+    // if (cartExistsResult.rows.length === 0) {
+    //     throw new Error('Cart does not exist');
+    // }
 
     const SQL = `
         INSERT INTO cart_products(id, cart_id, product_id) VALUES($1, $2, $3) RETURNING *
@@ -141,7 +140,7 @@ const fetchUsers = async () => {
     return response.rows;
 };
 
-const fetchCart = async (cart_id) => {
+const fetchCarts = async (cart_id) => {
     const SQL = `
         SELECT * FROM carts WHERE id = $1
     `;
@@ -193,7 +192,7 @@ module.exports = {
     createProduct,
     createCartProduct,
     fetchUsers,
-    fetchCart,
+    fetchCarts,
     fetchProducts,
     fetchCartProducts,
     destroyCartProduct,

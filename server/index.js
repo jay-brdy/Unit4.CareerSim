@@ -6,7 +6,7 @@ const {
     createProduct,
     createCartProduct,
     fetchUsers,
-    fetchCart,
+    fetchCarts,
     fetchProducts,
     fetchCartProducts,
     destroyCartProduct,
@@ -181,10 +181,10 @@ const {
     await createTables();
     console.log('tables created');
   
-    const [moe, lucy, ethyl, jay, tshirt, jacket, hat, socks, sticker] = await Promise.all([
+    const [moe, lucy, chau, jay, tshirt, jacket, hat, socks, sticker] = await Promise.all([
       createUser({ username: 'moe', password: 'm_pw'}),
       createUser({ username: 'lucy', password: 'l_pw'}),
-      createUser({ username: 'ethyl', password: 'e_pw'}),
+      createUser({ username: 'chau', password: 'c_pw'}),
       createUser({ username: 'jay', password: 'j_pw', is_admin: true}),
       createProduct({
          name: 'tshirt',
@@ -221,9 +221,36 @@ const {
     console.log(await fetchUsers());
     console.log(await fetchProducts());
   
-    console.log(await fetchCartProducts(moe.id));
-    const cart_product = await createCartProduct({ cart_id: moe.id, product_id: tshirt.id });
-    
+    const [moeCart, lucyCart, chauCart, jayCart] = await Promise.all([
+      createCart({ user_id: moe.id }),
+      createCart({ user_id: lucy.id }),
+      createCart({ user_id: chau.id }),
+      createCart({ user_id: jay.id })
+    ]);
+    console.log(await fetchCarts());
+
+    const inCart = await Promise.all([
+      createCartProduct({
+         cart_id: moeCart.id,
+         product_id: tshirt.id,
+         quantity: 1
+      }),
+      createCartProduct({
+        cart_id: moeCart.id,
+        product_id: jacket.id,
+        quantity: 1
+      }),
+      createCartProduct({
+        cart_id: moeCart.id,
+        product_id: hat.id,
+        quantity: 2
+      })
+    ]);
+    // console.log(inCart);
+
+    console.log(await fetchCartProducts(moeCart.id));
+    // const cart_product = await createCartProduct({ cart_id: moe.id, product_id: tshirt.id });
+
     const port = process.env.PORT || 3000;
     app.listen(port, ()=> console.log(`listening on port ${port}`));
   };
