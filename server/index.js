@@ -40,7 +40,7 @@ const {
     try {
       const { token } = await authenticate(req.body);
       const user = await findUserWithToken(token);
-      const cart = await fetchCart(user.id);
+      const cart = await fetchCarts(user.id);
       res.send({ token, user, cart });
     }
     catch(ex){
